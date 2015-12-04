@@ -1,0 +1,37 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<div class="container">
+
+	<toast></toast>
+
+	<h1 class="page-header">Events</h1>
+	<form name="eventForm" class="thing-form" role="form" novalidate>
+		<p class="input-group">
+			<input type="text" class="form-control" name="eventname" id="eventname" placeholder="Event Name (required)" ng-model="event.name" ng-maxlength="20"required/>
+			<span class="input-group-btn">
+				<button type="submit" class="btn btn-primary" ng-click="createEvent(eventForm)">Add Event</button>
+			</span>
+		</p>
+		<p class="text-danger" ng-show="submitted && eventForm.eventname.$error.required">Event name cannot be empty</p>				
+		<p class="text-danger" ng-show="submitted && eventForm.eventname.$error.maxlength">Event name cannot be longer than 20 characters</p>
+	</form>
+
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="col-md-6 col-lg-6 col-sm-6" ng-repeat="e in events">
+				<a href="/{{e._id}}/person" class="btn btn-link">
+					<span>{{e.name}}</span>
+				</a>
+				<span ng-show="isAdmin()">
+					<select class="btn btn-info" ng-options="user._id as user.email for user in users" ng-model="e.staff" ng-change="assignUser(e)">
+						<option value="">Assign to someone</option>
+					</select>
+				</span>
+				<button type="button" class="close" ng-click="deleteEvent($index, e)">&times;</button>
+			</ul>
+		</div>
+	</div>
+
+</div>
+<div connectivity="{connect: 'onConnect()', disconnect: 'onDisconnect()'}"></div>
+

@@ -1,0 +1,168 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<!-- <div class="container">
+
+<form class="thing-form">
+    <p class="input-group">
+      <input type="text" class="form-control" placeholder="Add a new thing here." ng-model="newThing">
+      <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary" ng-click="addThing()">Search Reviews</button>
+      </span>
+    </p>
+  </form>
+
+</div> -->
+
+
+<div id="wrapper" ng-class="{ 'toggled': istoggled }">
+
+	<!-- Sidebar -->
+	<div id="sidebar-wrapper">
+
+		<div>
+			
+		<h3 class="page-header">Events</h3>
+		<form name="eventForm">
+			<div class="form-group">
+				<div class="input-group">
+					<span class="input-group-btn">								
+						<button type="submit" class="btn btn-primary" ng-click="createEvent()">Add Event</button>
+					</span>
+					<input class="form-control" type="text" placeholder="Event Name" ng-model="event.name">							
+				</div>
+			</div>
+		</form>
+		</div>
+		
+		<div>
+			
+
+		<ul class="nav" style="overflow-y:auto;height:640px">
+			<li ng-repeat="e in events">
+				<a href="" ng-click="selectEvent(e)">{{e.name}}<button class="close" ng-click="deleteEvent(e)">&times;</button>
+				</a>
+			</li>			
+		</ul>
+				</div>
+
+	</div>
+	<!-- /#sidebar-wrapper -->
+
+	<!-- Page Content -->
+	<div id="page-content-wrapper">
+		<div class="container-fluid">
+
+			<div class="row" ng-show="!selectedEvent">
+				<div class="col-lg-12">
+					<h1>No Event Selected</h1>
+					<p>Please Select an Event from the Left</p>
+					<!-- <a href="" class="btn btn-default" id="menu-toggle" ng-click="istoggled = !istoggled">Toggle Menu</a> -->
+				</div>
+			</div>
+
+			<div class="row" ng-show="selectedEvent && attendees.length < 1">
+				<div class="col-lg-12">
+					<h1>No Attendee Yet.</h1>
+					<p>Upload a CSV file with all attendee list. Please ensure that the first column must be 'id'.</p>
+					
+					<input type="file" nv-file-select="" uploader="uploader" options="{ formData: [selectedEvent] }"/>
+					<table class="table">
+						<thead>
+							<tr>
+								<th width="50%">Name</th>
+								<th ng-show="uploader.isHTML5">Size</th>
+								<th ng-show="uploader.isHTML5">Progress</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in uploader.queue">
+								<td><strong>{{ item.file.name }}</strong></td>
+								<td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+								<td ng-show="uploader.isHTML5">
+									<div class="progress" style="margin-bottom: 0;">
+										<div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+									</div>
+								</td>
+								<td class="text-center">
+									<span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+									<span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+									<span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+								</td>
+								<td nowrap>
+									<button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+										<span class="glyphicon glyphicon-upload"></span> Upload
+									</button>
+									<button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+										<span class="glyphicon glyphicon-ban-circle"></span> Cancel
+									</button>
+									<button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+										<span class="glyphicon glyphicon-trash"></span> Remove
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+
+			<div class="row" ng-show="selectedEvent && attendees.length > 0">
+				
+				<div class="col-lg-12">
+					<p class="input-group">
+						<input type="text" class="form-control" placeholder="Search Attendee" ng-model="searchName"/>					
+						<span class="input-group-btn">
+							<button type="submit" class="btn btn-primary" ng-click="searchName=''">Clear Search</button>
+						</span>
+					</p>
+				</div>
+
+				<div class="col-lg-4" style="overflow-y:auto;height:640px">
+
+					<h3 class="page-header">Attendees</h3>
+
+					<ul class="nav">
+						<li ng-repeat="att in attendees | filter:{name: searchName}"><a href=""><span ng-click="selectAttendee($index, att)">{{att.name}}</span><button type="button" class="close" ng-click="deleteAttendee(att)">&times;</button></a></li>
+					</ul>
+				</div>
+
+				<div class="col-lg-8">
+					<div ng-show="selectedAttendee">
+
+						<h4>Barcode: {{selectedAttendee.barcode}}</h4>
+						<h4>Detail:</h4>
+						<table class="table">
+							<tbody>
+								<tr ng-repeat="(key, value) in selectedAttendee.detail">
+									<td>{{key}}</td><td>{{value}}</td>
+								</tr>
+							</tbody>
+						</table>
+						<button class="btn btn-primary col-sm-12 col-md-12 col-lg-12" ng-show="!selectedAttendee.present" ng-click="checkinAttendee(selectedAttendee)">Check In
+						</button>
+
+						<button class="btn btn-danger col-sm-12 col-md-12 col-lg-12" ng-show="selectedAttendee.present" ng-click="undoCheckin(selectedAttendee)">Undo Check In
+						</button>
+
+					</div>
+				</div>
+
+			</div>
+
+
+		</div>
+	</div>
+	<!-- /#page-content-wrapper -->
+
+</div>
+<!-- /#wrapper -->
+
+<!-- <footer class="footer">
+	<div class="container">
+		<p> Kawi &copy; 2014 | <a href="" ng-click="submitReview()">Submit a Review Site</a> | <a href="/login">Login</a>
+		</p>
+
+	</div>
+</footer> -->

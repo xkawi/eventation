@@ -1,0 +1,63 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<div class="container">
+
+	<div class="row">
+
+		<div class="col-md-12">
+
+		<h1 class="page-header">Events</h1>
+				
+				
+			<form name="eventForm" class="thing-form">
+				<p class="input-group">
+					<input type="text" class="form-control" placeholder="Event Name" ng-model="event.name"/>
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-primary" ng-click="createEvent()">Add Event</button>
+					</span>
+				</p>
+			</form>
+
+			<div class="row">
+				<div class="col-lg-12">
+					<ul class="nav nav-tabs nav-stacked col-md-4 col-lg-4 col-sm-6" ng-repeat="e in events">
+						<li><a ui-sref=".attendee({eventid: e._id})" ui-sref-opts="{reload: true}"><!-- <span ng-click="selectEvent(e)">{{e.name}}</span> -->{{e.name}}<button type="button" class="close" ng-click="deleteEvent(e)">&times;</button></a></li>
+					</ul>
+				</div>
+			</div>
+
+			<!-- <div ui-view></div> -->
+			
+		<div ui-view></div>
+	</div>
+
+		<!-- <div class="col-md-12" style="margin-bottom: 40px">
+
+			<h3>Upload queue</h3>
+			<p>Queue length: {{ uploader.queue.length }}</p>
+
+			
+
+			<div>
+				<div>
+					Queue progress:
+					<div class="progress" style="">
+						<div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }"></div>
+					</div>
+				</div>
+				<button type="button" class="btn btn-success btn-s" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length">
+					<span class="glyphicon glyphicon-upload"></span> Upload all
+				</button>
+				<button type="button" class="btn btn-warning btn-s" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading">
+					<span class="glyphicon glyphicon-ban-circle"></span> Cancel all
+				</button>
+				<button type="button" class="btn btn-danger btn-s" ng-click="uploader.clearQueue()" ng-disabled="!uploader.queue.length">
+					<span class="glyphicon glyphicon-trash"></span> Remove all
+				</button>
+			</div>
+
+		</div>
+	-->
+</div>
+
+</div>

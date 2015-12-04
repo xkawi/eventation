@@ -1,0 +1,114 @@
+<div class="container">
+
+	<div class="row" nv-file-drop="" uploader="uploader" filters="queueLimit">
+
+		<div class="col-md-12">
+
+			<h1 class="page-header">Attendees</h1>
+
+			<div class="row">
+
+				<div ng-show="attendees.length < 1" class="col-md-12">
+
+					<div>
+						<h3>Upload Attendee List (only accept CSV) - {{selectedEvent.name}}</h3>
+						<input type="file" nv-file-select="" uploader="uploader" options="{ formData: [{eid: eventid}] }"/>				
+					</div>
+
+					<table class="table">
+						<thead>
+							<tr>
+								<th width="50%">Name</th>
+								<th ng-show="uploader.isHTML5">Size</th>
+								<th ng-show="uploader.isHTML5">Progress</th>
+								<th>Status</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="item in uploader.queue">
+								<td><strong>{{ item.file.name }}</strong></td>
+								<td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+								<td ng-show="uploader.isHTML5">
+									<div class="progress" style="margin-bottom: 0;">
+										<div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+									</div>
+								</td>
+								<td class="text-center">
+									<span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+									<span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+									<span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+								</td>
+								<td nowrap>
+									<button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+										<span class="glyphicon glyphicon-upload"></span> Upload
+									</button>
+									<button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+										<span class="glyphicon glyphicon-ban-circle"></span> Cancel
+									</button>
+									<button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+										<span class="glyphicon glyphicon-trash"></span> Remove
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div ng-show="attendees.length > 0">
+
+					<div class="col-lg-12">
+						<p class="input-group">
+							<input type="text" class="form-control" placeholder="Search Attendee" ng-model="searchName"/>					
+							<span class="input-group-btn">
+								<button type="submit" class="btn btn-primary" ng-click="searchName=''">Clear Search</button>
+							</span>
+						</p>
+					</div>
+
+					<div class="col-lg-4" style="overflow-y:auto;height:350px">				
+						<ul class="nav nav-stacked col-md-12 col-lg-12 col-sm-12" ng-repeat="att in attendees | filter:{name: searchName}">
+							<li><a href=""><span ng-click="selectAttendee($index, att)">{{att.name}}</span><button type="button" class="close" ng-click="deleteAttendee(att)">&times;</button></a></li>
+						</ul>
+					</div>
+
+					<div class="col-lg-8">
+						<div ng-show="selectedAttendee">
+
+							<h4>Barcode: {{selectedAttendee.barcode}}</h4>
+							<h4>Detail:</h4>
+							<table class="table">
+								<tbody>
+									<tr ng-repeat="(key, value) in selectedAttendee.detail">
+										<td>{{key}}</td><td>{{value}}</td>
+									</tr>
+								</tbody>
+							</table>
+							<button class="btn btn-primary col-sm-12 col-md-12 col-lg-12" ng-show="!selectedAttendee.present" ng-click="checkinAttendee(selectedAttendee)">Check In
+							</button>
+
+							<button class="btn btn-danger col-sm-12 col-md-12 col-lg-12" ng-show="selectedAttendee.present" ng-click="undoCheckin(selectedAttendee)">Undo Check In
+							</button>
+
+						</div>
+					</div>
+				</div>
+				
+			</div>
+
+			<!-- <form name="eventForm" class="thing-form">
+				<p class="input-group">
+					<input type="text" class="form-control" placeholder="Attendee Name" ng-model="attendee.name"/>
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-primary" ng-click="addAttendee()">Add Attendee</button>
+					</span>
+				</p>
+			</form> -->
+
+			
+			
+		</div>
+
+	</div>
+
+</div>

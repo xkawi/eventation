@@ -1,0 +1,395 @@
+<div connectivity="{connect: 'onConnect()', disconnect: 'onDisconnect()'}"></div>
+
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<div class="container-fluid">
+
+	<div class="row" ng-show="attendees.length < 1">
+		<div class="container">
+			<h1>No Attendee Yet.</h1>
+			<p>Upload a CSV file with all attendee list. Please ensure that there is a header for each column.</p>
+
+			<input type="file" nv-file-select="" uploader="uploader" options="{ formData: [selectedEvent] }"/>
+			<table class="table">
+				<thead>
+					<tr>
+						<th width="50%">Name</th>
+						<th ng-show="uploader.isHTML5">Size</th>
+						<th ng-show="uploader.isHTML5">Progress</th>
+						<th>Status</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in uploader.queue">
+						<td><strong>{{ item.file.name }}</strong></td>
+						<td ng-show="uploader.isHTML5" nowrap>{{ item.file.size/1024/1024|number:2 }} MB</td>
+						<td ng-show="uploader.isHTML5">
+							<div class="progress" style="margin-bottom: 0;">
+								<div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+							</div>
+						</td>
+						<td class="text-center">
+							<span ng-show="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+							<span ng-show="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+							<span ng-show="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+						</td>
+						<td nowrap>
+							<button type="button" class="btn btn-success btn-xs" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
+								<span class="glyphicon glyphicon-upload"></span> Upload
+							</button>
+							<button type="button" class="btn btn-warning btn-xs" ng-click="item.cancel()" ng-disabled="!item.isUploading">
+								<span class="glyphicon glyphicon-ban-circle"></span> Cancel
+							</button>
+							<button type="button" class="btn btn-danger btn-xs" ng-click="item.remove()">
+								<span class="glyphicon glyphicon-trash"></span> Remove
+							</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+	</div>
+
+	<div class="row" ng-show="attendees.length > 0">
+
+		<!-- <div class="row" style="padding: 20px; margin:0 20px 20px 20px; background-color:white; border-radius:5px;">			
+			<div class="col-lg-12">
+
+				<div class="row">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Search Attendee by the chosen criteria" ng-model="searchTerm.text" ng-change="searching(searchTerm)">
+						<div class="input-group-btn">
+
+							<div class="btn-group" dropdown>
+								<button type="button" class="btn btn-default dropdown-toggle" style="width:100%">
+									<span ng-show="!searchTerm.criteria">Search Criteria</span>
+									<span ng-show="searchTerm.criteria">{{selectedKey}}</span>
+									<span class="caret"></span>
+								</button>
+								<ul class="dropdown-menu dropdown-menu-right" role="menu">
+									<li ng-repeat="k in keys"><a href="" ng-click="chooseKey($index, k)">{{k}}</a></li> 
+									<li class="divider"></li>
+									<li><a href="">Reset Criteria</a></li>     			
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="row" style="margin-top:5px;">
+					<div class="col-md-4 controls pull-left">
+						<toggle-switch ng-model="checkinMode" ng-click="changeMode(switchStatus)" knob-label="AUTO-CHECKIN" style="min-width:300px">
+						<toggle-switch>
+					</div>
+					<div class="col-md-4 text-center">
+						You are showing... <span ng-hide="showCheckin" class="">attendees that have not checked in yet.</span>
+						<span ng-show="showCheckin" class="ng-hide">attendees that have checked in.</span>
+					</div>
+					<div class="col-md-4 pull-right">
+						<button class="btn btn-link pull-right" ng-class="{'text-primary': showCheckin, 'text-danger': !showCheckin }" ng-click="showCheckin=!showCheckin">
+							<span ng-hide="showCheckin" class="">Show Checked In Attendees</span>
+							<span ng-show="showCheckin" class="ng-hide">Show Not Checked In Attendees</span>				
+						</button>
+					</div>
+				</div>
+			</div>
+		</div> -->
+
+		<!-- <div class="row">
+			<div class="col-lg-12 col-md-12 text-center">
+				<nvd3-pie-chart data="exampleData" id="exampleId" width="320" height="320" x="xFunction()" y="yFunction()" showLabels="true" labelType="value" color="colorFunction()" donut="true" donutLabelsOutside="true" donutRatio=".25">
+				<svg></svg>
+			</nvd3-pie-chart>				
+		</div>
+	</div> -->
+
+	<div class="row">
+
+			<!-- <h3>
+					<span>{{selectedEvent.name}}</span> |
+					<span>Total Attendees: {{attendees.length}}</span> |
+					<span>Checked-in: {{ (attendees|filter:{present:true}).length }}</span> |
+					<span>Not Checked-in: {{ (attendees|filter:{present:false}).length }}</span>
+				</h3> -->
+
+			<!-- <div class="col-lg-12 col-md-12">
+				<div class="row">
+					<div class="col-lg-4 col-md-4">
+						<div class="panel panel-email">
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-xs-3">
+										<i class="fa fa-envelope-o fa-5x"></i>
+									</div>
+									<div class="col-xs-9 text-right">
+										<div class="huge">
+											{{attendees.length}}                                            
+										</div>
+										<div>Total Attendees</div>
+									</div>
+								</div>
+							</div>
+							<a href="">
+								<div class="panel-footer">
+									<span class="pull-left" ng-show="!visibleApplication" ng-click="showApplication()">Show Details</span>
+									<span class="pull-left" ng-show="visibleApplication" ng-click="showApplication()">Hide Details</span>
+									<a class="pull-right" href="/application" target="_blank" tooltip="Go to applications" tooltip-placement="bottom"><i class="fa fa-arrow-circle-right"></i></a>
+									<div class="clearfix"></div>
+								</div>
+							</a>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-4">
+						<div class="panel panel-program">
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-xs-3">
+										<i class="fa fa-list fa-5x"></i>
+									</div>
+									<div class="col-xs-9 text-right">
+										<div class="huge">{{(attendees | filter:{present: true}).length}}</div>
+										<div>Checked In Attendees</div>
+									</div>
+								</div>
+							</div>
+							<a href="">
+								<div class="panel-footer">
+									<span class="pull-left" ng-show="!visibleApplication" ng-click="showApplication()">Show Details</span>
+									<span class="pull-left" ng-show="visibleApplication" ng-click="showApplication()">Hide Details</span>
+									<a class="pull-right" href="/application" target="_blank" tooltip="Go to applications" tooltip-placement="bottom"><i class="fa fa-arrow-circle-right"></i></a>
+									<div class="clearfix"></div>
+								</div>
+							</a>
+						</div>
+					</div>
+					<div class="col-lg-4 col-md-4">
+						<div class="panel panel-application">
+							<div class="panel-heading">
+								<div class="row">
+									<div class="col-xs-3">
+										<i class="fa fa-file-text-o fa-5x"></i>
+									</div>
+									<div class="col-xs-9 text-right">
+										<div class="huge">{{(attendees | filter:{present: false}).length}}</div>
+										<div>Non-Checked In Attendees</div>
+									</div>
+								</div>
+							</div>
+							<a href="">
+								<div class="panel-footer">
+									<span class="pull-left" ng-show="!visibleApplication" ng-click="showApplication()">Show Details</span>
+									<span class="pull-left" ng-show="visibleApplication" ng-click="showApplication()">Hide Details</span>
+									<a class="pull-right" href="/application" target="_blank" tooltip="Go to applications" tooltip-placement="bottom"><i class="fa fa-arrow-circle-right"></i></a>
+									<div class="clearfix"></div>
+								</div>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div> -->
+
+			<div class="col-lg-12 col-md-12">
+
+				<div class="row" style="background-color:#cc9900;padding:10px;color:#ffffff">
+					<div class="col-lg-12 col-md-12 table-responsive">
+						<table class="table borderless" style="margin-left:10px;">
+							<thead>
+								<tr class="text-center"><td>Event Name</td><td>Total Registered Attendees</td><td>Checked-In Attendees</td><td>Non Checked-In Attendees</td></tr>
+							</thead>
+							<tbody style="font-size:1em;">
+								<tr class="text-center">
+									<td>{{selectedEvent.name}}</td>
+									<td><h1>{{attendees.length}}</h1></td>
+									<td><h1><strong>{{(attendees | filter:{present: true}).length}}</strong></h1></td>
+									<td><h1><strong>{{(attendees | filter:{present: false}).length}}</strong></h1></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="row" style="padding: 20px; background-color:white; border-radius:5px; color:black">			
+					<div class="col-lg-12">
+
+						<div class="row">
+							<div class="col-md-12 controls text-center">
+								<toggle-switch ng-model="checkinMode" ng-click="changeMode(checkinMode)" knob-label="AUTO-CHECKIN" style="min-width:300px">
+								<toggle-switch>				
+							</div>
+						</div>
+						<div class="row" style="margin-bottom:10px">
+							<div class="col-md-12 text-center"><span class="text-info">Auto-checkin allows you to automatically check in attendee when the search keyword only return 1 result/attendee</span></div>
+						</div>
+						<div class="row">
+							<div class="input-group">
+								<input type="text" class="form-control" placeholder="Search Attendee by the chosen criteria" ng-model="searchTerm.text" ng-change="searching(searchTerm)">
+								<div class="input-group-btn">
+
+									<div class="btn-group" dropdown>
+										<button type="button" class="btn btn-default dropdown-toggle" style="width:100%">
+											<span ng-show="!searchTerm.criteria">Search Criteria</span>
+											<span ng-show="searchTerm.criteria">{{selectedKey}}</span>
+											<span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu dropdown-menu-right" role="menu">
+											<li ng-repeat="k in keys"><a href="" ng-click="chooseKey($index, k)">{{k}}</a></li> 
+											<li class="divider"></li>
+											<li><a href="" ng-click="searchTerm.criteria=''">Reset Criteria</a></li>     			
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row" style="margin-top:5px;">
+							<div class="col-md-12 col-lg-12 text-center">
+								<button class="btn btn-link" ng-click="showCheckin='';showAll=true">Show All Attendees</button>
+								You are showing... <span>{{(attendees | filter:{present: showCheckin} | universalFilter:searchTerm).length}}</span> attendees 
+								<span ng-hide="showAll">
+								<span ng-hide="showCheckin" class="">that have not checked in yet.</span>
+								<span ng-show="showCheckin" class="ng-hide">that have checked in.</span>									
+								</span>
+
+								<button class="btn btn-link" ng-class="{'text-primary': showCheckin, 'text-danger': !showCheckin }" ng-click="showCheckin=!showCheckin;showAll=false">
+									<span ng-hide="showCheckin" class="">Show Checked-In Attendees</span>
+									<span ng-show="showCheckin" class="ng-hide">Show Non-Checked-In Attendees</span>
+									</button>
+
+							</div>	
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<!-- <div class="col-lg-6 col-md-6 table-responsive">
+				<table class="table borderless" style="margin-left:10px;">
+					<tbody class="text-left;" style="font-size:1em;">
+						<tr>
+							<td><strong>Event Name:</strong><br/>{{selectedEvent.name}}</td>
+						</tr>
+						<tr>
+							<td><strong>Total Registered Attendees:</strong><br/>{{attendees.length}}</td>
+						</tr>
+						<tr>
+							<td><strong>Checked-In Attendees:</strong><br/>{{(attendees | filter:{present: true}).length}}</td>
+						</tr>
+						<tr>
+							<td><strong>Non Checked-In Attendees:</strong><br/>{{(attendees | filter:{present: false}).length}}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-lg-6 col-md-6 text-center" style="color:black;">
+				<div class="row">
+					<div class="col-lg-12 col-md-12">
+						<div class="input-group">
+							<input type="text" class="form-control" placeholder="Search Attendee by the chosen criteria" ng-model="searchTerm.text" ng-change="searching(searchTerm)">
+							<div class="input-group-btn">
+								<div class="btn-group" dropdown>
+									<button type="button" class="btn btn-default dropdown-toggle" style="width:100%">
+										<span ng-show="!searchTerm.criteria">Search Criteria</span>
+										<span ng-show="searchTerm.criteria">{{selectedKey}}</span>
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-menu-right" role="menu">
+										<li ng-repeat="k in keys"><a href="" ng-click="chooseKey($index, k)">{{k}}</a></li> 
+										<li class="divider"></li>
+										<li><a href="">Reset Criteria</a></li>     			
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row" style="margin-top:10px">
+					<div class="col-md-12 col-lg-12">
+						<toggle-switch ng-model="checkinMode" ng-click="changeMode(switchStatus)" knob-label="AUTO-CHECKIN" style="min-width:300px">
+						<toggle-switch>
+					</div>				
+				</div>
+				<div class="row" style="padding: 20px; margin:10px; background-color:white; border-radius:5px;">
+					<div class="col-md-12 col-lg-12 text-center">
+						<p>You are showing... <span ng-hide="showCheckin" class="">attendees that have not checked in yet.</span>
+						<span ng-show="showCheckin" class="ng-hide">attendees that have checked in.</span></p>
+						<button class="btn btn-link" ng-class="{'text-primary': showCheckin, 'text-danger': !showCheckin }" ng-click="showCheckin=!showCheckin">
+							<span ng-hide="showCheckin" class="">Show Checked In Attendees</span>
+							<span ng-show="showCheckin" class="ng-hide">Show Not Checked In Attendees</span>				
+						</button>					
+					</div>				
+				</div>
+			</div>
+		</div> -->
+
+	</div>
+
+		<div class="row" style="margin-top:10px;background-color:white">
+			<div class="col-lg-12 col-md-12 col-sm-12">
+
+				<table class="table table-hover">
+					<thead>
+					<tr>					
+						<th></th>
+						<th style="word-wrap: break-word;" ng-repeat="(key, value) in attendees[0]">
+						<span ng-show="key != '_id' && key != 'event' && key != 'present'">{{key}}</span>
+						</th>
+					</tr>						
+					</thead>
+					<tbody>
+					<tr ng-repeat="att in attendees | filter:{present: showCheckin} |universalFilter:searchTerm">
+						<td>
+							<a href="" class="text-primary" ng-show="!att.present" ng-click="checkinAttendee($index, att)">
+								<i class="fa fa-check-square-o" style="font-size:2em"></i>
+							</a>
+
+							<a href="" class="text-danger" ng-show="att.present" ng-click="undoCheckin($index, att)">
+								<i class="fa fa-undo" style="font-size:2em"></i>
+							</a>
+
+							<a href="" class="text-success" ng-click="editAttendee()">
+								<i class="fa fa-edit" style="font-size:2em"></i>
+							</a>
+						</td>
+
+						<td style="word-wrap: break-word;width:20px" ng-repeat="(key, value) in att">
+						<span ng-show="key != '_id' && key != 'event' && key != 'present'">{{value || 'NA'}}</span>
+						</td>
+						
+					</tr>
+					</tbody>
+				</table>
+
+				<!-- <div class="col-lg-3 col-md-4 col-sm-2 animate" ng-repeat="att in attendees |  filter:{present: showCheckin} |universalFilter:searchTerm">
+					<div class="result">
+
+						<table class="table borderless">
+							<tbody>
+								<tr ng-repeat="(key, value) in att">
+									<td style="word-wrap: break-word;"><span ng-show="key != '_id' && key != 'event' && key != 'present'"></span><strong>{{key}}:</strong><br/>{{value}}</td>
+								</tr>
+								<tr>
+									<td class="pull-left">
+										<button class="btn btn-primary" ng-show="!att.present" ng-click="checkinAttendee($index, att)">Check In
+										</button>
+										<button class="btn btn-warning" ng-show="att.present" ng-click="undoCheckin($index, att)">Undo Check In
+										</button>
+									<span class="glyphicon glyphicon-trash" style="color:red" ng-click="deleteAttendee($index, att)"></span>
+										
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+					</div>
+				</div>
+ -->
+			</div>
+		</div>
+
+
+	</div>
+
+	<toast></toast>
+</div>
